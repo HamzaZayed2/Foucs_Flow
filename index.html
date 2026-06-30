@@ -317,15 +317,34 @@ body::after {
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   padding: 28px;
   transition: var(--transition);
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .card:hover {
   border-color: rgba(255, 255, 255, 0.18);
   box-shadow: var(--panel-glow), 0 0 20px 0 rgba(255, 255, 255, 0.02), inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
 }
 
 /* Top Navigation Dock */
+.sticky-dock {
+  position: sticky;
+  top: 16px;
+  z-index: 110;
+  margin-bottom: 32px;
+}
+
 .dashboard-dock {
   display: flex;
   align-items: center;
@@ -333,6 +352,14 @@ body::after {
   gap: 20px;
   padding: 16px 28px;
   margin-bottom: 24px;
+}
+
+.dock-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
 }
 
 .logo-area {
@@ -1044,9 +1071,9 @@ body::after {
 }
 
 .primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(30, 189, 176, 0.4);
-  filter: brightness(1.1);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 30px rgba(30, 189, 176, 0.45);
+  filter: brightness(1.15);
 }
 
 .ghost-btn,
@@ -1071,9 +1098,9 @@ body::after {
 }
 
 .warm-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
-  filter: brightness(1.1);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+  filter: brightness(1.15);
 }
 
 .danger-btn {
@@ -1242,6 +1269,18 @@ body::after {
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  animation: fadeInTask 0.4s ease-out both;
+}
+
+@keyframes fadeInTask {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .task-card::before {
@@ -1263,8 +1302,8 @@ body::after {
 .task-card:hover {
   background: rgba(255, 255, 255, 0.035);
   border-color: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .task-card.done {
@@ -2162,14 +2201,21 @@ body::after {
   
   .dashboard-dock {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     padding: 16px 20px;
+    gap: 16px;
   }
   
+  .dock-tabs {
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: center;
+  }
+
   .dock-controls {
     flex-wrap: wrap;
     width: 100%;
-    justify-content: space-between;
+    justify-content: center;
   }
   
   .lane-grid {
@@ -2197,12 +2243,24 @@ body::after {
 
 <div class="shell">
   <!-- Interactive Navigation Dock -->
-  <header class="dashboard-dock card">
+  <header class="dashboard-dock sticky-dock card">
     <div class="logo-area">
       <span class="material-symbols-outlined">air</span>
       <h2>FocusFlow</h2>
     </div>
     
+    <div class="dock-tabs">
+      <button class="nav-tab-btn active" id="tabBtnBoard" onclick="switchMainTab('board')">
+        <span class="material-symbols-outlined">dashboard</span> <span id="txtTabBoard">Board</span>
+      </button>
+      <button class="nav-tab-btn" id="tabBtnSanctuary" onclick="switchMainTab('sanctuary')">
+        <span class="material-symbols-outlined">psychology</span> <span id="txtTabSanctuary">Sanctuary</span>
+      </button>
+      <button class="nav-tab-btn" id="tabBtnBreathing" onclick="switchMainTab('breathing')">
+        <span class="material-symbols-outlined">spa</span> <span id="txtTabBreathing">Breathing</span>
+      </button>
+    </div>
+
     <div class="dock-controls">
       <!-- Theme pills -->
       <div class="theme-pill-box">
@@ -2217,17 +2275,6 @@ body::after {
       <!-- Language Switcher -->
       <button class="nav-tab-btn" id="langToggleBtn" onclick="toggleLanguage()">
         <span class="material-symbols-outlined">translate</span> <span id="langBtnText">العربية</span>
-      </button>
-      
-      <!-- Tab Toggles -->
-      <button class="nav-tab-btn active" id="tabBtnBoard" onclick="switchMainTab('board')">
-        <span class="material-symbols-outlined">dashboard</span> <span id="txtTabBoard">Board</span>
-      </button>
-      <button class="nav-tab-btn" id="tabBtnSanctuary" onclick="switchMainTab('sanctuary')">
-        <span class="material-symbols-outlined">psychology</span> <span id="txtTabSanctuary">Sanctuary</span>
-      </button>
-      <button class="nav-tab-btn" id="tabBtnBreathing" onclick="switchMainTab('breathing')">
-        <span class="material-symbols-outlined">spa</span> <span id="txtTabBreathing">Breathing</span>
       </button>
     </div>
   </header>
@@ -5181,6 +5228,16 @@ function openTaskCreateDialog() {
   document.getElementById('taskDialog').showModal();
 }
 
+function applyStaggeredAnimations() {
+  document.querySelectorAll('.card:not(.task-card)').forEach((el, index) => {
+    el.style.animationDelay = (index * 0.05) + 's';
+  });
+}
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(applyStaggeredAnimations, 10);
+});
+
+
 function openTaskEditDialog(id) {
   SoundManager.playClick();
   const isAr = state.ui.lang === 'ar';
@@ -5439,6 +5496,9 @@ function createTaskCard(t) {
   container.className = `task-card priority-${t.priority}`;
   if (t.done) container.classList.add('done');
   
+  // Stagger animation based on index
+  container.style.animationDelay = (Math.random() * 0.15) + 's';
+
   // Overdue check
   const isOverdue = t.dueDate && new Date(t.dueDate) < new Date() && !t.done;
   if (isOverdue) container.classList.add('overdue');
